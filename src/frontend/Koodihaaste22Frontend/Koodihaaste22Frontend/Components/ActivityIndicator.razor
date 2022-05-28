@@ -1,0 +1,20 @@
+﻿<div hidden="@(!Visible)">
+    <MudStack AlignItems="AlignItems.Center" Justify="Justify.Center">
+
+        <MudProgressLinear 
+            Size="Size.Small" 
+            Style="height:10px" 
+            Color="Color.Success" 
+            Indeterminate="true" 
+            Class="my-7" />
+
+        <MudText>@Message</MudText>
+
+    </MudStack>
+</div>
+
+@code 
+{
+    [Parameter] public bool Visible { get; set; } = false;
+    [Parameter] public string Message { get; set; } = string.Empty;
+}

@@ -1,0 +1,45 @@
+﻿@code 
+{
+    [Fact(DisplayName = "Restaurant component renders correctly")]
+    public void RestaurantComponentRendersCorrectly()
+    {
+        using var ctx = new TestContext();
+        ctx.Services.AddSingleton(new Mock<ISnackbar>().Object);
+        ctx.Services.AddSingleton(new Mock<IApiService>().Object);
+
+        // Add a cascading value to the test contexts root render tree
+        ctx.RenderTree.Add<CascadingValue<AppState>>(parameters => parameters
+            .Add(p => p.Value, new AppState
+            {
+                RestaurantResponse = new()
+                {
+                    Restaurants = new List<RestaurantDto>()
+                }    
+            })
+        );
+
+        // Mock a restaurant
+        var restaurantDto = new RestaurantDto
+        {
+            ID = "123456789",
+            Name = "Mock restaurant",
+            Votes = 3,
+            Dishes = new List<DishDto>(),
+            OpeningHours = "10 - 17"
+        };
+
+        // Render the component
+        var cut = ctx.RenderComponent<Restaurant>
+        (
+            parameters => parameters
+            .Add(p => p.Item, restaurantDto)
+        );
+
+        // Get all paragrpahs in the component
+        var paragraphs = cut.FindAll("p");
+
+        // Assert that the markup contains the restaurant name
+        Assert.Contains(paragraphs, p => p.TextContent == restaurantDto.Name);
+    }
+}
+

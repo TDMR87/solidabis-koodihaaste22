@@ -1,0 +1,21 @@
+﻿@foreach (DishDto dish in Items)
+{
+    <MudText Typo="Typo.body2">
+        @dish.Name @((MarkupString)DisplayRestaurantDishAttributes(dish)) <b>@dish.Price</b>
+    </MudText>
+}
+
+@code 
+{
+    [Parameter] public IEnumerable<DishDto>? Items { get; set; } = new List<DishDto>();
+
+    private string DisplayRestaurantDishAttributes(DishDto dish)
+    {
+        if (dish?.Attributes?.Count > 0)
+        {
+            return $"<i>({string.Join(',', dish.Attributes)})</i>";
+        }
+
+        return string.Empty;
+    }
+}

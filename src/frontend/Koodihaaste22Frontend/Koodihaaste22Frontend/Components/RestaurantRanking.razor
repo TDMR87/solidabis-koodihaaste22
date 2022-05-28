@@ -1,0 +1,9 @@
+﻿<MudAvatar Color="Color.Success">
+    <p>@(Votes == 0 ? "~" : Ranking.ToString())</p>
+</MudAvatar>
+
+@code 
+{
+    [Parameter] public int Ranking { get; set; } = 0;
+    [Parameter] public int Votes { get; set; } = 0;
+}

@@ -1,0 +1,59 @@
+﻿@code 
+{
+    [Fact(DisplayName = "Restaurant rank is displayed correctly when received most votes")]
+    public void ComponentDisplaysCorrectRankWhenReceivedMostVotes()
+    {
+        using var ctx = new TestContext();
+
+        var cut = ctx.RenderComponent<RestaurantRanking>
+        (
+            parameters => parameters
+            .Add(p => p.Ranking, 1)
+            .Add(p => p.Votes, 10)
+        );
+
+        var paragraph = cut.Find("p");
+
+        Assert.Equal("1", paragraph.TextContent);
+    }
+
+    [Fact(DisplayName = "Restaurant rank is displayed correctly when received zero votes")]
+    public void ComponentDisplaysCorrectRankWhenReceivedZeroVotes()
+    {
+        using var ctx = new TestContext();
+
+        var cut = ctx.RenderComponent<RestaurantRanking>
+        (
+            parameters => parameters
+            .Add(p => p.Ranking, 7)
+            .Add(p => p.Votes, 0)
+        );
+
+        var paragraph = cut.Find("p");
+
+        Assert.Equal("~", paragraph.TextContent);
+    }
+
+    [Fact(DisplayName = "Component renders correct HTML markup")]
+    public void ComponentRendersCorrectly()
+    {
+        using var ctx = new TestContext();
+
+        var cut = ctx.RenderComponent<RestaurantRanking>
+        (
+            parameters => parameters
+            .Add(p => p.Ranking, 1)
+            .Add(p => p.Votes, 10)
+        );
+
+        cut.MarkupMatches
+        (
+            @<div class="mud-avatar mud-avatar-medium mud-avatar-filled mud-avatar-filled-success mud-elevation-0" style="">
+                <p>
+		            1
+	            </p>
+            </div>
+        );
+    }
+}
+

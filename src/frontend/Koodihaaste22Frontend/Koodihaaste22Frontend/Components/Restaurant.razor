@@ -1,0 +1,59 @@
+﻿<MudCard Style="">
+    <MudCardHeader Style="background-color:antiquewhite">
+        <CardHeaderAvatar>
+		    <RestaurantRanking Ranking="AppState?.CurrentRank(Item) ?? -1" Votes="Item.Votes" />
+        </CardHeaderAvatar>
+        <CardHeaderContent>
+            <MudText Typo="Typo.body1">@Item?.Name</MudText>
+            <MudText Typo="Typo.body2">@Item?.OpeningHours</MudText>
+        </CardHeaderContent>
+        <CardHeaderActions>
+            <RestaurantVotes Votes="Item.Votes" VoteChanged="@(async () => await ChangeVote())" />
+        </CardHeaderActions>
+    </MudCardHeader>
+    <MudCardMedia Image="@("img/food.jpg")" Height="150" />
+    <MudCardContent Style="background-color:antiquewhite">
+        @if (Item?.Dishes is not null)
+        {
+            <RestaurantDishes Items="Item.Dishes" />
+        }
+    </MudCardContent>
+</MudCard>
+
+@code 
+{
+    [CascadingParameter] public AppState? AppState { get; set; }
+    [Parameter] public RestaurantDto? Item { get; set; }
+    [Parameter] public HubConnection? HubConnection { get; set; }
+
+    [Inject] IApiService? Api { get; set; }
+    [Inject] ISnackbar? Snackbar { get; set; }
+
+    private async Task ChangeVote()
+    {
+        if (Api is not null && HubConnection is not null && Item is not null)
+        {
+            try
+            {
+                await Api.VoteForRestaurant(Item.ID);
+                await HubConnection.SendAsync("VoteRestaurant");
+            }
+            catch (Exception e)
+            {
+                Snackbar?.Add(severity: Severity.Error, message: e.Message);
+            }
+        }
+    }
+
+    private string GetCss()
+    {
+        if (AppState?.CurrentRank(Item) == 1 && Item?.Votes > 0)
+        {
+            return "border-width:10px;border-color:green;";
+        }
+        else
+        {
+            return string.Empty;
+        }
+    }
+}

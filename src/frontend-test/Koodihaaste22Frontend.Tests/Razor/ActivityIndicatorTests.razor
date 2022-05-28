@@ -1,0 +1,36 @@
+﻿@code 
+{
+    [Fact(DisplayName = "Component parameters are set correctly")]
+    public void ActivityIndicatorParametersSetCorrectly()
+    {
+        using var ctx = new TestContext();
+
+        var cut = ctx.RenderComponent<ActivityIndicator>
+        (
+            parameters => parameters
+            .Add(p => p.Message, "Loading...")
+            .Add(p => p.Visible, true)
+        );
+        
+        Assert.Equal("Loading...", cut.Instance.Message);
+        Assert.True(cut.Instance.Visible);
+    }
+
+    [Fact(DisplayName = "Component has a progress bar")]
+    public void ActivityIndicatorHasOneProgressBar()
+    {
+        using var ctx = new TestContext();
+
+        var cut = ctx.RenderComponent<ActivityIndicator>
+        (
+            parameters => parameters
+            .Add(p => p.Message, "Hello")
+            .Add(p => p.Visible, true)
+        );
+
+        var progressBars = cut.FindComponents<MudBlazor.MudProgressLinear>();
+
+        Assert.Equal(1, progressBars.Count);
+    }
+}
+

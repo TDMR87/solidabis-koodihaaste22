@@ -1,0 +1,96 @@
+﻿@page "/"
+@implements IAsyncDisposable
+@inject IApiService Api
+@inject ISnackbar Snackbar
+@inject IConfiguration Configuration
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavigationManager
+<PageTitle>Etusivu</PageTitle>
+
+<!-- Logo area -->
+<SiteLogo TextStyle="margin-bottom:-25px" />
+<br />
+
+<!-- Activity indicator -->
+<ActivityIndicator Visible="@(AppState?.IsBusy ?? false)" Message="Ladataan ravintoloita..." />
+
+<!-- Render restaurants -->
+@if (AppState?.RestaurantResponse?.Restaurants != null)
+{
+    // Iterate over each restaurant, ordering them by votes
+    foreach (var restaurant in AppState.RestaurantResponse.Restaurants.OrderByDescending(x => x.Votes))
+    {
+        // Render a restaurant
+        <Restaurant Item="restaurant" HubConnection="hubConnection" />
+        <br />
+
+        // If this is the most voted restaurant
+        if (AppState.CurrentRank(restaurant) == 1 && restaurant.Votes > 0)
+        {
+            // Show a toast notification
+            Snackbar.Add($"Tämän hetken ykkösvalinta on {restaurant.Name}!", Severity.Success);
+        }
+    } 
+}
+
+@code
+{
+    [CascadingParameter] public AppState? AppState { get; set; }
+    private HubConnection? hubConnection;
+
+    protected override async Task OnInitializedAsync()
+    {
+        if (AppState is null)
+        {
+            return;
+        }
+
+        AppState.IsBusy = true;
+
+        await ConsoleLogAsync($"Establishing SignalR connection to {NavigationManager.BaseUri}voting");
+
+        // Create a signalR hub connection
+        hubConnection = new HubConnectionBuilder()
+            .WithUrl($"{NavigationManager.BaseUri}voting")
+            .WithAutomaticReconnect()
+            .Build();
+
+        try
+        {
+            // Start the hub connection
+            await hubConnection.StartAsync();
+
+            // Register a handler for receiving votes from SignalR hub
+            hubConnection.On("VoteReceived", async () =>
+            {
+                // When a vote is received, get the latest restaurant data
+                AppState.RestaurantResponse = await Api.GetRestaurantsByCity(city: AppState.CurrentCity);   
+                await InvokeAsync(StateHasChanged);
+            });
+        }
+        catch (Exception e)
+        {
+            await ConsoleLogAsync(e.ToString());
+            Snackbar.Add(severity: Severity.Error, message: $"Something went wrong. {e.Message}");
+        }
+        finally
+        {
+            AppState.IsBusy = false;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ConsoleLogAsync(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", message);
+    }
+
+    public async ValueTask DisposeAsync()
+    {
+        if (hubConnection is not null)
+        {
+            await hubConnection.DisposeAsync();
+        }
+    }
+}

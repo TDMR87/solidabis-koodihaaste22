@@ -1,0 +1,24 @@
+﻿<MudStack Row="true" AlignItems="AlignItems.Center" Spacing="0">
+    <MudIconButton 
+        OnClick="@(async () => await VoteChanged.InvokeAsync())" 
+        Size="Size.Large" 
+        Icon="@Icons.Material.Filled.Favorite" 
+        Color="Color.Secondary" />
+    <MudText>@DisplayRestaurantVotes()</MudText>
+</MudStack>
+
+@code 
+{
+    [Parameter] public EventCallback VoteChanged { get; set; }
+    [Parameter] public int Votes { get; set; }
+
+    private string DisplayRestaurantVotes()
+    {
+        switch(Votes)
+        {
+            case 0: return "Ei ääniä";
+            case 1: return "1 ääni";
+            default: return Votes + " ääntä";
+        }
+    }
+}

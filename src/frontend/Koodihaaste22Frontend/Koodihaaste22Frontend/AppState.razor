@@ -1,0 +1,58 @@
+﻿<CascadingValue Value="this">
+    @ChildContent
+</CascadingValue>
+
+@code 
+{
+    [Parameter] public RenderFragment ChildContent { get; set; }
+
+    bool isBusy;
+
+    public bool IsBusy
+    {
+        get => isBusy;
+        set
+        {
+            isBusy = value;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private string? _currentCity = string.Empty;
+    public string? CurrentCity
+    {
+        get => _currentCity;
+        set
+        {
+            _currentCity = value;
+            InvokeAsync(StateHasChanged);
+        }
+    }
+
+    private RestaurantResponseDto? _restaurantResponse;
+    public RestaurantResponseDto? RestaurantResponse
+    {
+        get => _restaurantResponse;
+        set
+        {
+            _restaurantResponse = value;
+        }
+    }
+
+    /// <summary>
+    /// Returns the rank (1 being the most voted one) of the restaurant based on votes.
+    /// </summary>
+    /// <param name="restaurant"></param>
+    /// <returns></returns>
+    public int CurrentRank(RestaurantDto restaurant)
+    {
+        if (RestaurantResponse is not null)
+        {
+            int i = RestaurantResponse.Restaurants.OrderByDescending(o => o.Votes).ToList().IndexOf(restaurant);
+
+            return i + 1;
+        }
+
+        throw new ArgumentNullException(nameof(RestaurantResponse), "RestaurantResponse cannot be null.");
+    }
+}

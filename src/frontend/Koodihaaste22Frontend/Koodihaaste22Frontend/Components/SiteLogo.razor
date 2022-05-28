@@ -1,0 +1,12 @@
+﻿<MudStack AlignItems="AlignItems.Start" Spacing="0" Justify="Justify.FlexStart" style="@StackStyle">
+    <MudText Style="@TextStyle" Typo="@FontSize" Color="Color.Tertiary"><b>Mis<span style="color:burlywood">sä</span></b></MudText>
+    <MudText Style="@TextStyle" Typo="@FontSize" Color="Color.Tertiary"><b>tänä<span style="color:burlywood">än</span></b></MudText>
+    <MudText Style="" Typo="@FontSize" Color="Color.Tertiary"><b>syöt<span style="color:burlywood">äis</span>?</b></MudText>
+</MudStack>
+
+@code 
+{
+    [Parameter] public string TextStyle { get; set; } = string.Empty;
+    [Parameter] public string StackStyle { get; set; } = string.Empty;
+    [Parameter] public Typo FontSize { get; set; } = Typo.h2;
+}

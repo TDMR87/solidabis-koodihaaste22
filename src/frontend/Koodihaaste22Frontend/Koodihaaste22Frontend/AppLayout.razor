@@ -1,0 +1,99 @@
+﻿@inherits LayoutComponentBase
+@inject IApiService Api
+@inject ISnackbar Snackbar
+@inject IConfiguration Configuration
+
+<MudThemeProvider />
+<MudDialogProvider/>
+<MudSnackbarProvider/>
+
+<PageTitle>Koodihaaste22.BlazorServer</PageTitle>
+
+<MudLayout>
+    <MudAppBar Elevation="0" Color="@Color.Transparent">
+        <MudIconButton Icon="@Icons.Material.Filled.Menu" style="float:left;" Size="Size.Large" Color="Color.Inherit" Edge="Edge.Start" OnClick="@((e) => DrawerToggle())" />
+        <MudSpacer />
+        <MudTextField 
+            @bind-Value="AppState.CurrentCity" 
+            AutoFocus="true"
+            TextChanged="Search" 
+            Label="Paikkakunta" 
+            Margin="Margin.Dense" 
+            Variant="Variant.Filled" 
+            Adornment="Adornment.End"
+            AdornmentColor="Color.Dark"
+            DisableUnderLine="true" 
+            AdornmentIcon="@Icons.Material.Filled.Search" 
+            OnAdornmentClick="Search" />
+        <MudSpacer />
+    </MudAppBar>
+    <MudDrawer @bind-Open="@_drawerOpen" Color="Color.Dark" ClipMode="DrawerClipMode.Docked">
+        <MudNavMenu>
+
+            <SiteLogo 
+                FontSize="@Typo.h4" 
+                StackStyle="margin-left:16px;margin-top:15px" 
+                TextStyle="margin-bottom:-15px" />
+
+            <MudNavLink 
+                Href="https://github.com/TDMR87/solidabis-koodihaaste22/tree/master/src"
+                Target="_blank"
+                Icon="@Icons.Custom.Brands.GitHub">
+                    GitHub
+            </MudNavLink>
+
+        </MudNavMenu>
+    </MudDrawer>
+    <MudMainContent>
+        <MudContainer MaxWidth="MaxWidth.Medium">          
+            <br />
+            @Body
+            <br />
+        </MudContainer>
+    </MudMainContent>
+</MudLayout>
+
+@code 
+{
+    [CascadingParameter] private AppState? AppState { get; set; }
+
+    bool _drawerOpen;
+
+    void DrawerToggle()
+    {
+        _drawerOpen = !_drawerOpen;
+    }
+
+    protected override async Task OnAfterRenderAsync(bool firstRender)
+    {
+        if (firstRender)
+        {
+            AppState.CurrentCity = Configuration.GetSection("DefaultCity").Value;
+        }
+    }
+
+    async Task Search()
+    {
+        if (AppState is null)
+        {
+            return;
+        }
+
+        AppState.IsBusy = true;
+
+        try
+        {
+            AppState.RestaurantResponse = await Api.GetRestaurantsByCity(city: AppState.CurrentCity);
+        }
+        catch (Exception e)
+        {
+            Snackbar.Add(severity: Severity.Error, message: e.Message);
+        }
+        finally
+        {
+            AppState.IsBusy = false;
+        }
+
+        await InvokeAsync(StateHasChanged);
+    }
+}
