@@ -1,4 +1,8 @@
-# Solidabis koodihaaste 2022
+# Solidabis koodihaaste 2022 Frontend
+
+![Alt text](/src/frontend/Koodihaaste22Frontend/Koodihaaste22Frontend/wwwroot/img/screenshot1.png?raw=true "Optional Title")
+
+***
 
 Tehtävänäsi on toteuttaa lounaspaikkaäänestyssovelluksen frontend valmista APIa vasten (työkalut saat valita itse).
 Arvosteluperusteet tärkeysjärjestyksessä:
