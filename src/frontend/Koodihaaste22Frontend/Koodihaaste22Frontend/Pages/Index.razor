@@ -47,11 +47,9 @@
 
         AppState.IsBusy = true;
 
-        await ConsoleLogAsync($"Establishing SignalR connection to {NavigationManager.BaseUri}voting");
-
         // Create a signalR hub connection
         hubConnection = new HubConnectionBuilder()
-            .WithUrl($"{NavigationManager.BaseUri}voting")
+            .WithUrl("http://localhost:5000/voting") // This address needs to be hardcoded for now, in order to make SignalR work on a web-proxy.
             .WithAutomaticReconnect()
             .Build();
 
@@ -70,8 +68,8 @@
         }
         catch (Exception e)
         {
-            await ConsoleLogAsync(e.ToString());
-            Snackbar.Add(severity: Severity.Error, message: $"Something went wrong. {e.Message}");
+            await ConsoleLogAsync($"SignalR connection error. {e.ToString()}");
+            Snackbar.Add(severity: Severity.Error, message: $"SignalR connection error. {e.Message}");
         }
         finally
         {
