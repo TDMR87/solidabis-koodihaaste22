@@ -2,6 +2,7 @@
 @inject IApiService Api
 @inject ISnackbar Snackbar
 @inject IConfiguration Configuration
+@inject IJSRuntime JSRuntime
 
 <MudThemeProvider />
 <MudDialogProvider/>
@@ -87,7 +88,8 @@
         }
         catch (Exception e)
         {
-            Snackbar.Add(severity: Severity.Error, message: e.Message);
+            await ConsoleLogAsync($"Restaurant API error. {e.ToString()}");
+            Snackbar.Add(severity: Severity.Error, message: $"Restaurant API error. {e.Message}");
         }
         finally
         {
@@ -95,5 +97,10 @@
         }
 
         await InvokeAsync(StateHasChanged);
+    }
+
+    private async Task ConsoleLogAsync(string message)
+    {
+        await JSRuntime.InvokeVoidAsync("console.log", message);
     }
 }

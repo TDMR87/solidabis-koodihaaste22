@@ -35,7 +35,16 @@ public class ApiService : IApiService
         handler.CookieContainer = new CookieContainer();
 
         // Get the voter id from session storage
-        var voteridCache = await _cacheStorage.GetAsync<string>("VOTERID");
+        ProtectedBrowserStorageResult<string> voteridCache = default;
+
+        try
+        {
+            voteridCache = await _cacheStorage.GetAsync<string>("VOTERID");
+        }
+        catch (Exception)
+        {
+            // Log
+        }
 
         // If previous voterid was found in the cache, add it to the cookie container
         if (!string.IsNullOrWhiteSpace(voteridCache.Value))
